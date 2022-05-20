@@ -1,166 +1,129 @@
+import time
 import csv
 from itertools import combinations
-from pickletools import float8
+from tqdm import tqdm
 
+start_time = time.time()
 """
-CdC : le programme doit lire un fichier contenant des info sur les actions
-d'où le fichier actions_data.csv constitué au préalable avec les données du CdC
-"""
-# Creation de la liste des actions à partir du csv ; liste = [{}, {}, ...]
-
-csv_shares_list = []
-shares_list = []
-with open ('actions_data.csv', 'r') as csv_file:
-    for elt in csv.reader(csv_file, delimiter=';'):
-        csv_shares_list.append(elt)
-    del csv_shares_list[0]
-    for csv_action in csv_shares_list:
-        formatted_action = {'action_name':csv_action[0], 
-                        'action_cost':float(csv_action[1]),
-                        'action_profit':float(csv_action[2])}
-        cost = formatted_action['action_cost']
-        profit_rate = formatted_action['action_profit']
-        formatted_action['action_profit_amount'] = cost * profit_rate
-        del formatted_action['action_profit']
-        shares_list.append(formatted_action)
-
-
-    #print(actions_list)
-    #print(actions_list[14]['action_cost']) # EXPL : récupère le prix de Action-15
-
-""" 
-obj : trouver toutes les combinaisons d'actions pour un portefeuille de 500 Euro MAX
-puis tester calculer et trier par ordre décroissant leur bénéfice, afin d'afficher 
+Objectif : trouver toutes les combinaisons d'actions pour un portefeuille de 500 Euro MAX
+puis tester calculer et trier par ordre décroissant leur bénéfice, afin d'afficher
 la meilleure combinaison
 """
 
-""" 1_combinaison de toutes actions entre elles:
-"""
-test_shares_list =[] # liste pour tests (petit nbr d'actions)
+wallet = 500
+actions_data_file = 'actions_data.csv'
 
-test_shares_list.append(shares_list[0])
-test_shares_list.append(shares_list[1])
-test_shares_list.append(shares_list[2])
-#print(test_actions_list)
+csv_shares_list = []
+shares_list = []
+combinations_list = []
+ok_cost_combi_list = []
+multi_cost_list = []
+one_share_list = []
+multi_shares_list = []
+multi_names_list = []
+multi_profit_list = []
+share_dict = {}
 
+# Creation de la liste des actions à partir du csv ; liste = [{}, {}, ...]
+def create_formatted_shares_list(actions_data_file):
+    with open (actions_data_file, 'r') as csv_file:
+        for elt in csv.reader(csv_file, delimiter=';'):
+            csv_shares_list.append(elt)
+        del csv_shares_list[0]
+        for csv_action in csv_shares_list:
+            formatted_action = {'action_name':csv_action[0], 
+                'action_cost':float(csv_action[1]),
+                'action_profit':
+                    (float(csv_action[1])*float(csv_action[2])/100)
+            }
+            shares_list.append(formatted_action)
+    del shares_list[12 : 19]
+    print("Nombre d'actions : "+ str(len(shares_list)))
+    calculate_and_list_combinations(shares_list)
 
-combinations_list = [] # liste de toutes les combinaisons
-ok_cost_combi_list = [] # liste des combinaisons dont le coût total <100 (peuvent entrer ds portefeuille)
-multi_cost_list = [] # liste des coûts des actions d'une combinaison
+def calculate_and_list_combinations(shares_list):
+    for iter in range(1, (len(shares_list) + 1)):
+        shares_combi = combinations(shares_list, iter)
+        for combi in shares_combi:  # combi = 1 tuple of 1 or several shares
+            combinations_list.append(combi)
+    print('')
+    print('NOMBRE DE COMBI POSSIBLES :')
+    print(len(combinations_list))
+    print('')
+    separate_mono_n_multi_shares_combinations(combinations_list)
 
+def separate_mono_n_multi_shares_combinations(combinations_list):
+    for each_combi in range(0,(len(combinations_list))):
+        # Selection des combinaisons mono-action
+        if len(combinations_list[each_combi]) == 1:
+            one_share_list.append(combinations_list[each_combi])
+        # Selection des combinaisons multi-actions
+        elif len(combinations_list[each_combi]) > 1:
+            multi_shares_list.append(combinations_list[each_combi])
+    list_ok_cost_mono_share_combi(one_share_list)
 
-shares_qty = len(test_shares_list) # nbr d'actions ds la liste (3)
-for iter in range(1, (shares_qty+1)):
-    shares_combi = combinations(test_shares_list, iter) # = 'liste' de 7 combinaisons/tuples
-    # pour chacune de ces combinaisons :     
-    for combi in shares_combi:  # combi = tuple contenant 1 ou +sieurs actions différentes
-        #print(combi)
-        combinations_list.append(combi)
-        
-#print(combinations_list)
-#print(len(combinations_list))
-
-#print(combinations_list[6])
-#print(combinations_list[6][0]) # 1er dico du 7e tuple de la liste
-
-"""
-SI tuple contient plusieurs dicos : faire somme des dico['action_cost'] 
-Si tuple contient 1 seul dico :
-pour chq dico de chq tuple, vérifier ['action_cost'] < 100
-
-"""
-for n in range(0, (len(combinations_list))):
-    if len(combinations_list[n]) == 1:
-        if (combinations_list[n][0]['action_cost']) < 100: 
-            ok_cost_combi_list.append(combinations_list[n])
-        else :
-            pass
-    elif len(combinations_list[n]) > 1:
-        for m in range(0, (len(combinations_list[n]))):
-            multi_cost_list.append(combinations_list[n][m]['action_cost'])
-            #print('sum(multi_cost_list) :')
-            #print(sum(multi_cost_list))
-        if sum(multi_cost_list) < 100: 
-            ok_cost_combi_list.append(combinations_list[n])
-            multi_cost_list.clear()
+def list_ok_cost_mono_share_combi(one_share_list):
+    for mono_share in one_share_list:
+        if mono_share[0]['action_cost'] <= wallet:
+            ok_cost_combi_list.append(mono_share[0])
         else:
             pass
+    list_ok_cost_multi_shares_combi(multi_shares_list, wallet)
 
-#print(len(ok_cost_combi_list))
-#print(ok_cost_combi_list) # liste des combinaisons dt coût < 100
-
-
-print('****************')
-one_shares_list = []
-multi_shares_list = []
-
-multi_names_list = []
-
-combi_multi_names_list = []
-combi_multi_profit_list = []
-combi_multi_cost_list = []
-combi_profit_sum_list = []
-combi_cost_sum_list = []
-combi_share_name_list = []
-combi_dict = {}
-profitable_shares_list = []
-one_share_name_list = []
-one_share_price_list = []
-one_share_profit_list = []
-
-
-# calculer benef total de chq combi puis trier benef
-"""pr chq tuple :
-* si long tuple (p) = 1 (contient 1 seule action) => ajout ds profit_list
-* si long tuple > 1 (+sieurs actions)
-    pr chq action (q) du tuple (p)
-""" 
-for each_combi in range(0,(len(ok_cost_combi_list))):
-    
-    if len(ok_cost_combi_list[each_combi]) == 1:
-        one_shares_list.append(ok_cost_combi_list[each_combi])
-    # j'isole les tuples de +sieurs actions
-    elif len(ok_cost_combi_list[each_combi]) > 1:
-        multi_shares_list.append(ok_cost_combi_list[each_combi])
-#print(multi_shares_list)
-for each_tuple in multi_shares_list:
-    combi_multi_names_list.clear()
-    for each_dict in each_tuple:
-        combi_multi_profit_list.append(each_dict['action_profit_amount'])
-        combi_profit_sum = sum(combi_multi_profit_list)
-        combi_multi_cost_list.append(each_dict['action_cost'])
-        combi_cost_sum = sum(combi_multi_cost_list)
-        
-        combi_multi_names_list.append(each_dict['action_name'])
-        
-    combi_share_name_list.append(combi_multi_names_list)
-    print(combi_share_name_list)
-    combi_profit_sum_list.append(combi_profit_sum)
-    combi_cost_sum_list.append(combi_cost_sum)
-    combi_multi_profit_list.clear()
-    combi_multi_cost_list.clear()
-    """ PB action_name : ne prend que la dernière valeur !"""
-
-
-print('')
-print(combi_profit_sum_list)
-print(combi_cost_sum_list)
-print(combi_share_name_list)
-print('')
-for element in range(0, len(combi_profit_sum_list)):
+def format_combi(multi_names_list, multi_cost_sum, multi_profit_sum):
     share_dict = {
-        'share(s)_name': combi_share_name_list[element],
-        'share(s)_price': combi_cost_sum_list[element],
-        'combi_profit_amount': combi_profit_sum_list[element]}
-    profitable_shares_list.append(share_dict)
-#print(profitable_shares_list)
-#print('')
-#print(one_shares_list)
-#print('')
-for one_share in one_shares_list:
-    
-    one_share_name_list.append(one_share[0]['action_name'])
-    one_share_price_list.append(one_share[0]['action_cost'])
-    one_share_profit_list.append(one_share[0]['action_profit_amount'])
-#print(one_share_name_list)
-#print(one_share_profit_list)
+        'action_name': multi_names_list,
+        'action_cost': multi_cost_sum,
+        'action_profit': multi_profit_sum
+        }
+    return share_dict
+
+def list_ok_cost_multi_shares_combi(multi_shares_list, wallet):
+    for multi_share in tqdm((multi_shares_list), desc="COST MULTI_COMBI"):
+        multi_names_list = []
+        for each_dict in multi_share:
+            multi_names_list.append(each_dict['action_name'])
+            multi_profit_list.append(each_dict['action_profit'])
+            multi_profit_sum = sum(multi_profit_list)
+            multi_cost_list.append(each_dict['action_cost'])
+            multi_cost_sum = sum(multi_cost_list)
+        if sum(multi_cost_list) <= wallet:
+            share_dict = format_combi(multi_names_list,
+                                    multi_cost_sum,
+                                    multi_profit_sum)
+            ok_cost_combi_list.append(share_dict)
+            multi_profit_list.clear()
+            multi_cost_list.clear()
+            multi_names_list = []
+        else:
+            pass
+    sort_combi_list_by_profit(ok_cost_combi_list)
+
+def sort_combi_list_by_profit(ok_cost_combi_list):
+    best_combi_list = sorted(ok_cost_combi_list,
+                                key=lambda k: k['action_profit'],
+                                reverse=True)
+    display_best_combination(best_combi_list)
+
+def display_best_combination(best_combi_list):
+    print('')
+    print("La meilleure combinaison d'actions est :")
+    print("- Nom des actions : "+str(best_combi_list[0]['action_name']))
+    print("- Coût total des actions : "+str(best_combi_list[0]['action_cost']))
+    print("- Bénéfices par action (€): "+str(best_combi_list[0]['action_profit']))
+    print('')
+    calculate_stock_portfolio_profit(best_combi_list)
+
+def calculate_stock_portfolio_profit(best_combi_list):
+    qty_of_shares = int(len(best_combi_list[0]['action_name']))
+    print("Nombre d'actions : " + str(qty_of_shares))
+    combi_profit_amount = best_combi_list[0]['action_profit']
+    print("Montant total des bénéfices d'un portefeuille de 500 euros:")
+    print(str((qty_of_shares*combi_profit_amount))+' €')
+    print('')
+
+create_formatted_shares_list(actions_data_file)
+
+# Temps d'exécution
+duration = time.time() - start_time
+print("durée d'exécution du programme : %s secondes" %(duration))
