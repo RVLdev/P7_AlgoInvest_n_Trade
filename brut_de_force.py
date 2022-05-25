@@ -65,11 +65,10 @@ def display_best_combination(best_combi, profits):
     print("- Nom des actions : ")
     for share in best_combi:
         print((share['action_name']))
-    shares_qty = len(best_combi)
     best_combi_cost = add_list_shares_costs(best_combi)
-    print("- Coût total des actions (€): "+str(best_combi_cost))
-    print("- Bénéfices par action (€): "+str(profits))
-    print("Bénéfices du portefeuille de 500 euros : "+str(shares_qty*profits))
+    print("- Coût total des actions (€): "+str(round(best_combi_cost, 2)))
+    print("- Bénéfices (€): "+str(round(profits, 2)))
+
 
 create_formatted_shares_list(actions_data_file)
 
