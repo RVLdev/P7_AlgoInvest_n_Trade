@@ -66,7 +66,7 @@ def display_best_combination(best_combi, profits):
     for share in best_combi:
         print((share['action_name']))
     best_combi_cost = add_list_shares_costs(best_combi)
-    print("- Coût total des actions (€): "+str(round(best_combi_cost, 2)))
+    print("- Coût total des actions (€): "+str(best_combi_cost))
     print("- Bénéfices (€): "+str(round(profits, 2)))
 
 
