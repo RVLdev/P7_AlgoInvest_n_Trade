@@ -20,9 +20,9 @@ def create_formatted_shares_list(actions_data_file):
             csv_shares_list.append(elt)
         del csv_shares_list[0]
         for csv_action in csv_shares_list:
-            formatted_action = {'action_name':csv_action[0],
-                'action_cost':float(csv_action[1]),
-                'action_profit':
+            formatted_action = {'share_name':csv_action[0],
+                'share_cost':float(csv_action[1]),
+                'share_profit':
                     (float(csv_action[1])*float(csv_action[2])/100)
             }
             shares_list.append(formatted_action)
@@ -32,14 +32,14 @@ def add_list_shares_costs(combi):
     # Somme le prix des actions d'une combinaison.
     cost_list = []
     for each_share in combi:
-        cost_list.append(each_share['action_cost'])
+        cost_list.append(each_share['share_cost'])
     return sum(cost_list)
 
 def add_list_shares_profit(combi):
     # Somme le montant des bénéfices d'une combinaison.
     profit_list = []
     for each_action in combi:
-        profit_list.append(each_action['action_profit'])
+        profit_list.append(each_action['share_profit'])
     return sum(profit_list)
 
 def calculate_and_list_combinations(shares_list):
@@ -64,11 +64,10 @@ def display_best_combination(best_combi, profits):
     print("Meilleure combinaison d'actions pour un portefeuille de 500 euros:")
     print("- Nom des actions : ")
     for share in best_combi:
-        print((share['action_name']))
+        print((share['share_name']))
     best_combi_cost = add_list_shares_costs(best_combi)
     print("- Coût total des actions (€): "+str(best_combi_cost))
     print("- Bénéfices (€): "+str(round(profits, 2)))
-
 
 create_formatted_shares_list(actions_data_file)
 
