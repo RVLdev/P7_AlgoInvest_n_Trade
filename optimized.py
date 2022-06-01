@@ -44,13 +44,13 @@ def sort_basic_shares_list_by_profit(basic_shares_list):
     shares_list1 = sorted(basic_shares_list, 
                         key=lambda k: k['share_profit_rate'],
                         reverse=True)
-    combi1 = list_best_profit_shares_for_WALLET(shares_list1)
-    shares_list.clear()
+
     shares_list2 = sorted(basic_shares_list, 
                         key=lambda k: k['share_profit_amount'],
                         reverse=True)
+    combi1 = list_best_profit_shares_for_WALLET(shares_list1)
     combi2 = list_best_profit_shares_for_WALLET(shares_list2)
-    choose_best_combi(combi1, combi2)
+    choose_best_combination(combi1, combi2)
 
 def list_best_profit_shares_for_WALLET(shares_list):
     # Liste les actions les plus rentables formant la meilleure combinaison.
@@ -64,7 +64,7 @@ def list_best_profit_shares_for_WALLET(shares_list):
             best_combi.append(share)
     return best_combi
 
-def choose_best_combi(combi1, combi2):
+def choose_best_combination(combi1, combi2):
     for p_rated_share in combi1:
         combi1_profit_amount.append(p_rated_share['share_profit_amount'])
     for p_amount_share in combi2:
@@ -74,7 +74,6 @@ def choose_best_combi(combi1, combi2):
         best_combi = combi1
     else:
         best_combi = combi2
-
     display_best_combination(best_combi)
 
 def display_best_combination(best_combi):
