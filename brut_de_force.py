@@ -16,7 +16,7 @@ shares_list = []
 def create_formatted_shares_list(actions_data_file):
     # Creation de la liste des actions à partir du fichier csv.
     with open (actions_data_file, 'r') as csv_file:
-        for elt in csv.reader(csv_file, delimiter=';'):
+        for elt in csv.reader(csv_file, delimiter=','):
             csv_shares_list.append(elt)
         del csv_shares_list[0]
         for csv_action in csv_shares_list:
