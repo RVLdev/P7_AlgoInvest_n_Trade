@@ -2,10 +2,10 @@ import time
 import csv
 
 """
-Objectif : afficher la combinaison d'actions générant le meilleur bénéfice,
-pour un portefeuille de 500 Euro MAX,
-sans parcourir toutes les combinaisons possibles,
-et en moins d'une seconde. 
+Goal:
+Find the combination of maximum profit shares for a 500 euros wallet. 
+Shouldn't consider every combinations.
+Should be executed in less than one second.
 """
 start_time = time.time()
 
@@ -22,7 +22,7 @@ best_shares_costs_list = []
 profit_amount = []
 
 def create_formatted_shares_list(actions_data_file):
-    # Creation de la liste des actions à partir du fichier csv.
+    # Create a usable formatted list of the shares form csv file.
     with open (actions_data_file, 'r') as csv_file:
         for elt in csv.reader(csv_file, delimiter=','):
             csv_shares_list.append(elt)
@@ -40,7 +40,7 @@ def create_formatted_shares_list(actions_data_file):
     sort_basic_shares_list_by_profit(basic_shares_list)
 
 def sort_basic_shares_list_by_profit(basic_shares_list):
-    # Tri par taux de 'profitabilité'
+    # Sort shares list by profit rate and by profit amount.
     shares_list1 = sorted(basic_shares_list, 
                         key=lambda k: k['share_profit_rate'],
                         reverse=True)
@@ -48,12 +48,13 @@ def sort_basic_shares_list_by_profit(basic_shares_list):
     shares_list2 = sorted(basic_shares_list, 
                         key=lambda k: k['share_profit_amount'],
                         reverse=True)
+
     combi1 = list_best_profit_shares_for_WALLET(shares_list1)
     combi2 = list_best_profit_shares_for_WALLET(shares_list2)
     choose_best_combination(combi1, combi2)
 
 def list_best_profit_shares_for_WALLET(shares_list):
-    # Liste les actions les plus rentables formant la meilleure combinaison.
+    # Make the list of the most profitable shares for a 500€ wallet.
     cost_list = []
     costs_sum = 0
     best_combi = []
@@ -65,6 +66,10 @@ def list_best_profit_shares_for_WALLET(shares_list):
     return best_combi
 
 def choose_best_combination(combi1, combi2):
+    """
+    Choose between best profit rate combination 
+    and best profit amount combination.
+    """
     for p_rated_share in combi1:
         combi1_profit_amount.append(p_rated_share['share_profit_amount'])
     for p_amount_share in combi2:
@@ -77,7 +82,6 @@ def choose_best_combination(combi1, combi2):
     display_best_combination(best_combi)
 
 def display_best_combination(best_combi):
-    # Affiche le résultat
     print("Meilleure combinaison d'actions pour un portefeuille de 500 euros:")
     print("- Nom des actions : ")
     for share in best_combi:
@@ -89,6 +93,6 @@ def display_best_combination(best_combi):
 
 create_formatted_shares_list(actions_data_file)
 
-# Temps d'exécution
+# Processing time.
 duration = time.time() - start_time
 print("durée d'exécution du programme : %s secondes" %(duration))

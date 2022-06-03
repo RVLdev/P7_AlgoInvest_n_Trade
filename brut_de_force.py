@@ -3,8 +3,9 @@ import csv
 from itertools import combinations
 
 """
-Objectif : trouver toutes les combinaisons d'actions pour un portefeuille de 500 Euro MAX
-puis selectionner et afficher la meilleure combinaison.
+Goal :
+Find every possible combinations of shares for a 500 euros wallet. 
+Then choose and display combination of maximum profit shares.
 """
 start_time = time.time()
 
@@ -14,7 +15,7 @@ csv_shares_list = []
 shares_list = []
 
 def create_formatted_shares_list(actions_data_file):
-    # Creation de la liste des actions à partir du fichier csv.
+    # Create a usable formatted list of the shares form csv file.
     with open (actions_data_file, 'r') as csv_file:
         for elt in csv.reader(csv_file, delimiter=','):
             csv_shares_list.append(elt)
@@ -29,14 +30,14 @@ def create_formatted_shares_list(actions_data_file):
     calculate_and_list_combinations(shares_list)
 
 def add_list_shares_costs(combi):
-    # Somme le prix des actions d'une combinaison.
+    # Make the sum of a combination actions prices.
     cost_list = []
     for each_share in combi:
         cost_list.append(each_share['share_cost'])
     return sum(cost_list)
 
 def add_list_shares_profit(combi):
-    # Somme le montant des bénéfices d'une combinaison.
+    # Make the sum of a combination actions profits.
     profit_list = []
     for each_action in combi:
         profit_list.append(each_action['share_profit'])
@@ -44,8 +45,8 @@ def add_list_shares_profit(combi):
 
 def calculate_and_list_combinations(shares_list):
     """
-    Calcule les combinaisons et sélectionne celles qui répondent aux
-    critères (portefeuille <= 500 Euros, profit maximal)
+    Create combinations of actions.
+    Choose thoses matching criteria (wallet <= 500 €, maximum profit).
     """
     profits = 0
     for iter in range(1, (len(shares_list) + 1)):
@@ -54,13 +55,12 @@ def calculate_and_list_combinations(shares_list):
             combi_costs_sum = add_list_shares_costs(combi)
             if combi_costs_sum <= wallet:
                 combi_profits_sum = add_list_shares_profit(combi)
-                if combi_profits_sum > profits:
-                    profits = combi_profits_sum
-                    best_combi = combi
+                if combi_profits_sum > profits:  # sorts by profit
+                    profits = combi_profits_sum  # keeps highest profit
+                    best_combi = combi  # highest profit combination = best combination
     display_best_combination(best_combi, profits)
 
 def display_best_combination(best_combi, profits):
-    # Affiche le résultat
     print("Meilleure combinaison d'actions pour un portefeuille de 500 euros:")
     print("- Nom des actions : ")
     for share in best_combi:
@@ -71,6 +71,6 @@ def display_best_combination(best_combi, profits):
 
 create_formatted_shares_list(actions_data_file)
 
-# Temps d'exécution
+# Processing time.
 duration = time.time() - start_time
 print("durée d'exécution du programme : %s secondes" %(duration))
