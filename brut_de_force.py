@@ -30,14 +30,14 @@ def create_formatted_shares_list(actions_data_file):
     calculate_and_list_combinations(shares_list)
 
 def add_list_shares_costs(combi):
-    # Make the sum of a combination actions prices.
+    # Make the sum of combination actions prices.
     cost_list = []
     for each_share in combi:
         cost_list.append(each_share['share_cost'])
     return sum(cost_list)
 
 def add_list_shares_profit(combi):
-    # Make the sum of a combination actions profits.
+    # Make the sum of combination actions profits.
     profit_list = []
     for each_action in combi:
         profit_list.append(each_action['share_profit'])
